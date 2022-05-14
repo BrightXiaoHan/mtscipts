@@ -1,2 +1,4 @@
 sentencepiece
+more_itertools
+portalocker
 typer
