@@ -4,11 +4,19 @@ import logging
 import os
 import shutil
 import sys
+from pathlib import Path
+from typing import Union
 
 import portalocker
 
 # global logger for this project
 logger = logging.getLogger("lanmttrainer")
+
+
+def count_lines(file_path: Union[str, Path]):
+    """Count total lines of given file."""
+    with open(file_path, "r") as f:
+        return sum(1 for _ in f)
 
 
 def check_md5sum(dest_path, expected_md5):

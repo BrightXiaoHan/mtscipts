@@ -1,16 +1,12 @@
 import io
 from collections import defaultdict
-from pathlib import Path
-from typing import List, Union
+from typing import List
 
 import sentencepiece as spm
 import typer
 from more_itertools import interleave, take
 
-
-def count_lines(file_path: Union[str, Path]):
-    with open(file_path, "r") as f:
-        return sum(1 for _ in f)
+from lanmttrainer.utils import count_lines
 
 
 def get_sentence_iterator(
