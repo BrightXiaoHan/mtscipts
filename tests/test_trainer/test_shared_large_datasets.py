@@ -9,22 +9,22 @@ from lanmttrainer.utils import count_lines
 def test_shared_large_datasets(tmpdir):
     lang_paris = ["en-zh", "en-fr", "en-de", "en-es", "en-ru", "en-it"]
     pair2num = {pair: random.randint(100, 1000) for pair in lang_paris}
-    trainprefix = "train"
+    trainpref = "train"
 
     for pair in lang_paris:
         src, tgt = pair.split("-")
-        srcfile = tmpdir.join(f"{trainprefix}.{pair}.{src}")
-        tgtfile = tmpdir.join(f"{trainprefix}.{pair}.{tgt}")
+        srcfile = tmpdir.join(f"{trainpref}.{pair}.{src}")
+        tgtfile = tmpdir.join(f"{trainpref}.{pair}.{tgt}")
 
         srcfile.write("\n".join(["a" for _ in range(pair2num[pair])]))
         tgtfile.write("\n".join(["b" for _ in range(pair2num[pair])]))
 
-    shared_large_datasets(tmpdir, ",".join(lang_paris), 300, trainprefix)
+    shared_large_datasets(tmpdir, ",".join(lang_paris), 300, trainpref)
 
     for pair in lang_paris:
         src, tgt = pair.split("-")
-        src_path = os.path.join(tmpdir.strpath, f"part*.{trainprefix}.{pair}.{src}")
-        tgt_path = os.path.join(tmpdir.strpath, f"part*.{trainprefix}.{pair}.{tgt}")
+        src_path = os.path.join(tmpdir.strpath, f"part*.{trainpref}.{pair}.{src}")
+        tgt_path = os.path.join(tmpdir.strpath, f"part*.{trainpref}.{pair}.{tgt}")
 
         src_files = glob.glob(src_path)
         tgt_files = glob.glob(tgt_path)
