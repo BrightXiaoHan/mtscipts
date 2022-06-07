@@ -1,0 +1,14 @@
+en-cs
+en-de
+en-ja
+en-ru
+en-uk
+en-zh
+en-hr
+fr-de
+de-fr
+uk-cs
+cs-uk
+sah-ru
+ru-sah
+en-liv

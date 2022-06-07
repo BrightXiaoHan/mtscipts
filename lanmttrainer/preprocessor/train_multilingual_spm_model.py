@@ -1,3 +1,4 @@
+"""Script to train multilingual sentencepiece models."""
 import io
 from collections import defaultdict
 from typing import List
@@ -12,6 +13,7 @@ from lanmttrainer.utils import count_lines
 def get_sentence_iterator(
     corpus_files, languages, input_sentence_size, sample_temprature
 ):
+    """Build data iterator for sentencepiece trainer."""
     typer.echo("Counting length of each file.")
     lengths = [count_lines(file_path) for file_path in corpus_files]
     typer.echo("Counting length of each file done.")
@@ -28,7 +30,7 @@ def get_sentence_iterator(
 
     sum_length = sum(lengths)
     lang2temp = {
-        lang: pow(length / sum_length, sample_temprature)
+        lang: pow(length / sum_length, 1.0 / sample_temprature)
         for lang, length in lang2length.items()
     }
     sum_temp = sum(lang2temp.values())
@@ -69,6 +71,8 @@ def train_spm_model(
     ),
     output_folder_with_prefix: str = typer.Option(
         "spm",
+        "--output-folder-with-prefix",
+        "-o",
         help="Output folder with prefix. For example: /tmp/enzh which will create /tmp/enzh.model.",
     ),
     sample_temprature: float = typer.Option(
