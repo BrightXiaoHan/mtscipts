@@ -1,4 +1,4 @@
-if [ -z "${DATA_DIR}" ]; then
+if [ -z "${DATA_DIR}" ]; theR
   echo "Please set DATA_DIR in the environment variables."
   exit 1
 fi

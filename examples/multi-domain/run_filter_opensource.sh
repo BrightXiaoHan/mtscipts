@@ -4,6 +4,9 @@ if [ -z "${DATA_DIR}" ]; then
 fi
 
 SOURCE_ROOT=$(dirname ${BASH_SOURCE[0]})
+# 移除旧的数据
+rm -f $DATA_DIR/raw.en $DATA_DIR/raw.zh
+rm -f $DATA_DIR/test.en $DATA_DIR/test.zh
 
 for folder in $(find $ROOT/datasets/online -maxdepth 2 -mindepth 2 -type d );
 do
@@ -24,3 +27,7 @@ done
 cd $DATA_DIR
 
 opusfilter $SOURCE_ROOT/opus_config_opensource.yml
+
+rm train.en train.zh
+ln zh.rules train.zh
+ln en.rules train.en

@@ -11,11 +11,13 @@ from lanmttrainer.utils import count_lines
 
 
 def get_sentence_iterator(
-    corpus_files, languages, input_sentence_size, sample_temprature
+    corpus_files, languages, sample_temprature
 ):
     """Build data iterator for sentencepiece trainer."""
     typer.echo("Counting length of each file.")
     lengths = [count_lines(file_path) for file_path in corpus_files]
+    total_length = sum(lengths)
+
     typer.echo("Counting length of each file done.")
     lang2length = defaultdict(int)
 
@@ -35,7 +37,7 @@ def get_sentence_iterator(
     }
     sum_temp = sum(lang2temp.values())
     lang2sample = {
-        lang: int(input_sentence_size * temp / sum_temp)
+        lang: int(total_length * temp / sum_temp)
         for lang, temp in lang2temp.items()
     }
 
@@ -55,7 +57,6 @@ def train_spm_model(
         "--corpus",
         "-c",
         help="Corpus files to train spm models. Please ensure this parameter is the same order as parameter `languages`."
-        "Meanwhile, please ensure the files are shuffled.",
     ),
     vocab_size: int = typer.Option(
         ..., "--vocab-size", "-s", help="Vocabulary size to train spm models."
@@ -86,7 +87,7 @@ def train_spm_model(
     langs = set(languages)
     model = io.BytesIO()
     sentence_iterator = get_sentence_iterator(
-        corpus_files, languages, input_sentence_size, sample_temprature
+        corpus_files, languages, sample_temprature
     )
 
     spm.SentencePieceTrainer.train(

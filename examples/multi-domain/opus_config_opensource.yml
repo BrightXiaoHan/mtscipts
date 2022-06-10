@@ -40,30 +40,3 @@ steps:
         model: 3
         src_tokenizer: [jieba, zh]
         tgt_tokenizer: [moses, en]
-
-  - type: filter
-    parameters:
-      inputs: [zh.rules, en.rules]
-      output: [train.zh, train.en]
-      filters:
-        - WordAlignFilter:
-            src_threshold: 0
-            tgt_threshold: 0
-            model: 3
-            priors: align.priors
-            src_tokenizer: [jieba, zh]
-            tgt_tokenizer: [moses, en]
-
-  - type: filter
-    parameters:
-      inputs: [zh.rules, en.rules]
-      output: [misalign.zh, misalign.en]
-      filterfalse: true
-      filters:
-        - WordAlignFilter:
-            src_threshold: 0
-            tgt_threshold: 0
-            model: 3
-            priors: align.priors
-            src_tokenizer: [jieba, zh]
-            tgt_tokenizer: [moses, en]
