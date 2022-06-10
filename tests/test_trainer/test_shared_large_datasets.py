@@ -1,12 +1,15 @@
+"""Test cases for lanmttrainer/trainer/fairseq/shared_large_datasets.py."""
 import glob
 import os
 import random
+
 from lanmttrainer.trainer.fairseq.shared_large_datasets import \
     shared_large_datasets
 from lanmttrainer.utils import count_lines
 
 
 def test_shared_large_datasets(tmpdir):
+    """Test shared_large_datasets."""
     lang_paris = ["en-zh", "en-fr", "en-de", "en-es", "en-ru", "en-it"]
     pair2num = {pair: random.randint(100, 1000) for pair in lang_paris}
     trainpref = "train"
