@@ -20,6 +20,7 @@ def count_lines(file_path: Union[str, Path]):
 
 
 def check_md5sum(dest_path, expected_md5):
+    """Check md5sum of a file."""
     md5 = hashlib.md5()
     with open(dest_path, "rb") as infile:
         for line in infile:
@@ -34,7 +35,7 @@ def check_md5sum(dest_path, expected_md5):
 
 
 def download_file(source_path, dest_path, extract_to=None, expected_md5=None):
-    """Downloading utility.
+    """Util function to download file from source_path to dest_path.
 
     :param source_path: the remote uri to download
     :param dest_path: where to save the file
