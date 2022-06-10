@@ -1,3 +1,4 @@
+"""Shared Large datasets into parts."""
 from pathlib import Path
 
 import typer

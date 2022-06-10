@@ -82,9 +82,7 @@ def train_spm_model(
         help="Sample temprature of each language. Useful for training multilingual models.",
     ),
 ):
-    """
-    Train spm models for source and target languages.
-    """
+    """Train spm models for source and target languages."""
     langs = set(languages)
     model = io.BytesIO()
     sentence_iterator = get_sentence_iterator(
