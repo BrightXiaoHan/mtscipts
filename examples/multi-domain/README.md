@@ -67,12 +67,17 @@
 │       └── zh
 
 # 其他测试集
-```
-清洗和准备语料
-```
+需要指定的环境变量
+```bash
 # 指定环境变量为上面数据集的存放目录
 export DATA_DIR=/path/to/dataset
 
+# 指定eflomal的路径
+FLOMAL_PATH=/path/to/eflomal/
+```
+
+清洗和准备语料
+```bash
 # 清洗公司内垂域数据
 bash run_filter_online.sh
 
@@ -80,4 +85,16 @@ bash run_filter_online.sh
 bash run_filter_opensource.sh
 ```
 
-训练分词模型以及训练字词
+使用CodeSwitch技术对语料进行扩充
+```
+bash apply_codeswitch.sh
+```
+
+训练分词模型
+```
+bash tokenize.sh train
+```
+分词（分词过程中使用Subword Regularzation对语料进行五倍扩充）
+```
+bash tokenize.sh tokenize
+```
