@@ -6,20 +6,17 @@ steps:
   - type: preprocess
     parameters:
       inputs: [train.zh, train.en]
-      outputs: [train.zh.tok, en.subset.en.tok]
+      outputs: [train.zh.tok, train.en.tok]
       preprocessors:
         - Tokenizer:
-            tokenizer: [jieba, moese]
+            tokenizer: [jieba, moses]
             languages: [zh, en]
           
-
-  - type: filter
+  - type: preprocess
     parameters:
-      inputs: [zh.subset, en.subset]
-      outputs: [test.zh, test.en]
-      filterfalse: false
-      filters:
-        - LengthFilter:
-            min_length: 10
-            max_length: 150
-            unit: [char, word]
+      inputs: [train.zh.tok.codeswich, train.en.tok.codeswich]
+      outputs: [train.zh.codeswich, train.en.codeswich]
+      preprocessors:
+        - Detokenizer:
+            tokenizer: [jieba, moses]
+            languages: [zh, en]
