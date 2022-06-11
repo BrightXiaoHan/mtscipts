@@ -1,7 +1,5 @@
-if [ -z "${DATA_DIR}" ]; then
-  echo "Please set DATA_DIR in the environment variables."
-  exit 1
-fi
+LANMT_TAINER_DIR=$(dirname $0)/../..
+source $LANMT_TAINER_DIR/lanmttrainer/shell_utils.sh
 
 SOURCE_ROOT=$(dirname ${BASH_SOURCE[0]})
 # 移除旧的数据

@@ -1,7 +1,5 @@
-if [ -z "${DATA_DIR}" ]; theR
-  echo "Please set DATA_DIR in the environment variables."
-  exit 1
-fi
+LANMT_TAINER_DIR=$(dirname $0)/../..
+source $LANMT_TAINER_DIR/lanmttrainer/shell_utils.sh
 
 SOURCE_ROOT=$(dirname "${BASH_SOURCE[0]}")
 
@@ -14,7 +12,7 @@ function pwait() {
 function run() {
   folder=$1
   cd $folder
-  opusfilter $SOURCE_ROOt/opus_config_online.yml
+  opusfilter $SOURCE_ROOT/opus_config_online.yml
   
   if [ $? -eq 0 ]; then
     echo "Successfully filtered $folder"
@@ -40,5 +38,5 @@ do
     continue
   fi
   run $folder &
-  pwait 20  # max 10 jobs running at the same time
+  pwait 10  # max 10 jobs running at the same time
 done

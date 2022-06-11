@@ -1,0 +1,25 @@
+common:
+  output_directory: .
+
+steps:
+
+  - type: preprocess
+    parameters:
+      inputs: [train.zh, train.en]
+      outputs: [train.zh.tok, en.subset.en.tok]
+      preprocessors:
+        - Tokenizer:
+            tokenizer: [jieba, moese]
+            languages: [zh, en]
+          
+
+  - type: filter
+    parameters:
+      inputs: [zh.subset, en.subset]
+      outputs: [test.zh, test.en]
+      filterfalse: false
+      filters:
+        - LengthFilter:
+            min_length: 10
+            max_length: 150
+            unit: [char, word]

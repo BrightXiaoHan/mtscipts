@@ -13,10 +13,13 @@ def spm_encode_with_subword_regularization(
         ..., "--input-file", "-i", help="Path to input file."
     ),
     output_suffix: str = typer.Option(
-        "subr", "--output-suffix", "-s", help="Suffix to add to output file."
+        "subr", "--output-suffix", "-o", help="Suffix to add to output file."
     ),
     sample_size: int = typer.Option(
         5, "--sample-size", "-s", help="Number of samples to generate."
+    ),
+    alpha: float = typer.Option(
+        0.1, "--alpha", "-a", help="Alpha value for subword regularization."
     ),
 ):
     """Apply subword regularization to given text file."""
@@ -25,12 +28,13 @@ def spm_encode_with_subword_regularization(
     outf = open(f"{input_file}.{output_suffix}", "w")
     for line in fileinput.input(input_file):
         line = line.strip()
-        pieces = s.encode(line, output_type=str, enable_sampling=False)
+        pieces = s.encode(line, out_type=str, enable_sampling=False)
+        print(" ".join(pieces), file=outf)
         for _ in range(sample_size - 1):
             pieces = s.encode(
-                line, out_type=str, enable_sampling=True, alpha=0.1, nbest_size=-1
+                line, out_type=str, enable_sampling=True, alpha=alpha, nbest_size=-1
             )
-            print(pieces, file=outf)
+            print(" ".join(pieces), file=outf)
 
     outf.close()
 
