@@ -18,12 +18,15 @@ function run() {
     --model 3 \
     -f zh-en.fwd \
     -r zh-en.rev
+
+  opusfilter $SOURCE_ROOT/opus_config_codeswitch.yml --single 2 > /dev/null 2>&1
+
 }
 
 for folder in $(find $DATA_DIR/online -maxdepth 2 -mindepth 2 -type d ) $DATA_DIR;
 do
   echo "Processing $folder"
   run $folder &
-  pwait 5
+  pwait 10
 done
 

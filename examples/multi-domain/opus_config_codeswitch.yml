@@ -14,9 +14,14 @@ steps:
           
   - type: preprocess
     parameters:
-      inputs: [train.zh.tok.codeswich, train.en.tok.codeswich]
-      outputs: [train.zh.codeswich, train.en.codeswich]
+      inputs: [train.zh.tok, train.en.tok]
+      outputs: [train.zh.codeswitch, train.en.codeswitch]
       preprocessors:
+        - Codeswitcher:
+            max_replace_ratio: 0.3
+            pharaoh_fwd: zh-en.fwd
+            pharaoh_rev: zh-en.rev
         - Detokenizer:
             tokenizer: [jieba, moses]
             languages: [zh, en]
+
