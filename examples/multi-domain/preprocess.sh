@@ -1,9 +1,8 @@
 LANMT_TAINER_DIR=$(dirname $0)/../..
 source $LANMT_TAINER_DIR/lanmttrainer/shell_utils.sh
 SOURCE_ROOT=$(realpath $(dirname $0))
-LANMT_TAINER_DIR=$(dirname $0)/../..
 
-EPOCH_SIZE=50000000
+EPOCH_SIZE=$1
 
 SRCLANG=en
 TGTLANG=zh
@@ -50,7 +49,7 @@ merge_and_shuf $DATA_DIR GEN
 
 echo "Shared Datasets"
 langpairs=$(awk -v srclang=$SRCLANG -v tgtlang=$TGTLANG \
-  '{printf "%s%s-%s%s",srclang,$2,tgtlang,$2}' $SOURCE_ROOT/DOMAIN_LIST.txt)
+  '{printf "%s_%s-%s_%s",srclang,$2,tgtlang,$2}' $SOURCE_ROOT/DOMAIN_LIST.txt)
 # join by ','
 langpairs_str=$(echo $langpairs | paste -sd ',')
 
@@ -58,12 +57,12 @@ PYTHONPATH=${LANMT_TAINER_DIR}:${PYTHONPATH} \
 python ${LANMT_TAINER_DIR}/lanmttrainer/trainer/fairseq/shared_large_datasets.py \
   $TRAIN_DIR/data \
   --lang-pairs $langpairs_str \
-  --epoch_sents 50000000 \
+  --epoch_sents $EPOCH_SIZE \
   --trainpref train > /dev/null 2>&1
 
 # Shared large datasets into chunks
-total_sentences=$(wc -l < $DATA_DIR/train.en)
-total_epoch=$[$total_sentences / 50000000]
+total_sentences=$(find $TRAIN_DIR/data -type f -name "train.${SRCLANG}*" -exec cat {} + | wc -l)
+total_epoch=$[$total_sentences / $EPOCH_SIZE]
 echo "Toatal epochs: $total_epoch"
 
 for i in $(seq 0 $total_epoch); do
@@ -78,6 +77,6 @@ for i in $(seq 0 $total_epoch); do
         --srcdict $TRAIN_DIR/data/fairseq.vocab \
         --tgtdict $TRAIN_DIR/data/fairseq.vocab \
         --destdir $TRAIN_DIR/data-bin/shard${i} \
-        --workers 30 > $TRAIN_DIR/data-bin/shard${i}/preprocess.log 2>&1
+        --workers 30 > $TRAIN_DIR/data-bin-$SRCLANG-$TGTLANG/shard${i}/preprocess.log 2>&1
   done
 done
