@@ -27,6 +27,7 @@ function merge_and_shuf(){
   awk 'NR%5==1 || NR%5==2' $folder/train.$TGTLANG.spm >> $TRAIN_DIR/data/train.${TGTLANG}_$domain.sort
   awk 'NR%5==3 || NR%5==4' $folder/train.$TGTLANG.spm >> $TRAIN_DIR/data/train.${TGTLANG}_$domain.sort
 
+  # TODO large file raise OOM error
   paste $TRAIN_DIR/data/train.${SRCLANG}_$domain.sort $TRAIN_DIR/data/train.${TGTLANG}_$domain.sort | shuf \
     | awk -F "\t" -v out1="$TRAIN_DIR/data/train.${SRCLANG}_$domain" -v out2="$TRAIN_DIR/data/train.${TGTLANG}_$domain" '{ print $1 > out1 ; print $2 > out2 }'
   rm $TRAIN_DIR/data/train.${SRCLANG}_$domain.sort $TRAIN_DIR/data/train.${TGTLANG}_$domain.sort
