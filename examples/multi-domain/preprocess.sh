@@ -49,10 +49,15 @@ echo "Copy $DATA_DIR"
 merge_and_shuf $DATA_DIR GEN
 
 echo "Shared Datasets"
+langpairs=$(awk -v srclang=$SRCLANG -v tgtlang=$TGTLANG \
+  '{printf "%s%s-%s%s",srclang,$2,tgtlang,$2}' $SOURCE_ROOT/DOMAIN_LIST.txt)
+# join by ','
+langpairs_str=$(echo $langpairs | paste -sd ',')
+
 PYTHONPATH=${LANMT_TAINER_DIR}:${PYTHONPATH} \
 python ${LANMT_TAINER_DIR}/lanmttrainer/trainer/fairseq/shared_large_datasets.py \
   $TRAIN_DIR/data \
-  --lang-pairs "cs-en,de-en,hr-en,ja-en,uk-en,zh-en,ru-en" \
+  --lang-pairs $langpairs_str \
   --epoch_sents 50000000 \
   --trainpref train > /dev/null 2>&1
 
@@ -63,7 +68,10 @@ echo "Toatal epochs: $total_epoch"
 
 for i in $(seq 0 $total_epoch); do
   echo "Sharding $i/$total_epoch..."
-  for domain in $(cat $SOURCE_ROOT/DOMAIN_LIST.txt | awk '{print $2}');do
+  for pair in $langpairs;do
+    # split by '-'
+    srclang=$(echo $pair | cut -d'-' -f1)
+    tgtlang=$(echo $pair | cut -d'-' -f2)
     fairseq-preprocess --source-lang ${SRCLANG} --target-lang ${TGTLANG}_$domain \
         --trainpref $TRAIN_DIR/data/part${i}.train.${SRCLANG}-${TGTLANG}_$domain \
         --validpref $TRAIN_DIR/data/dev.${SRCLANG}-${TGTLANG}_$domain \
