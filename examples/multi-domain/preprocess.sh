@@ -72,9 +72,9 @@ for i in $(seq 0 $total_epoch); do
     # split by '-'
     srclang=$(echo $pair | cut -d'-' -f1)
     tgtlang=$(echo $pair | cut -d'-' -f2)
-    fairseq-preprocess --source-lang ${SRCLANG} --target-lang ${TGTLANG}_$domain \
-        --trainpref $TRAIN_DIR/data/part${i}.train.${SRCLANG}-${TGTLANG}_$domain \
-        --validpref $TRAIN_DIR/data/dev.${SRCLANG}-${TGTLANG}_$domain \
+    fairseq-preprocess --source-lang $srclang --target-lang tgtlang \
+        --trainpref $TRAIN_DIR/data/part${i}.train \
+        --validpref $TRAIN_DIR/data/valid \
         --srcdict $TRAIN_DIR/data/fairseq.vocab \
         --tgtdict $TRAIN_DIR/data/fairseq.vocab \
         --destdir $TRAIN_DIR/data-bin/shard${i} \
