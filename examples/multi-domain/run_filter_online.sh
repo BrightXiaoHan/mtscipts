@@ -40,3 +40,4 @@ do
   run $folder &
   pwait 10  # max 10 jobs running at the same time
 done
+wait

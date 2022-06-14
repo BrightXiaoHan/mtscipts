@@ -21,6 +21,13 @@ steps:
             max_replace_ratio: 0.3
             pharaoh_fwd: zh-en.fwd
             pharaoh_rev: zh-en.rev
+
+  - type: preprocess
+    parameters:
+      inputs: [train.zh.codeswitch, train.en.codeswitch]
+      outputs: [train.zh.cs, train.en.cs]
+      n_jobs: 5
+      preprocessors:
         - Detokenizer:
             tokenizer: [jieba, moses]
             languages: [zh, en]

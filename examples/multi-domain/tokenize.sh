@@ -16,15 +16,18 @@ if [ "$MODE" == "train" ]; then
 else
   echo "Tokenizing all data..."
 
-  for file in $(find $DATA_DIR -name "train.*" ! -name "*.spm") $(find $DATA_DIR -name "test.*" ! -name "*.spm");
+  for file in $(find $DATA_DIR -name "train.en") $(find $DATA_DIR -name "train.zh") \
+      $(find $DATA_DIR -name "train.en.codeswitch") $(find $DATA_DIR -name "train.zh.codeswitch") \
+      $(find $DATA_DIR -name "test.zh") $(find $DATA_DIR -name "test.en");
   do
     echo "Tokenizing $file..."
     if [ -f "$file.spm" ]; then
-      echo "Skipping $file.spm already exists."
       continue
     fi
 
-    if [[ $file =~ "train" ]]; then
+    if [[ "$file" =~ "codeswitch" ]]; then
+      samplesize=2
+    elif [[ "$file" =~ "train" ]]; then
       samplesize=5
     else
       samplesize=1
@@ -45,4 +48,5 @@ else
       --alpha $alpha &
     pwait 10
   done
+  wait
 fi
