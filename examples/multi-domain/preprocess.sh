@@ -4,6 +4,14 @@ SOURCE_ROOT=$(realpath $(dirname $0))
 
 EPOCH_SIZE=$1
 
+if [ ! -z $EPOCH_SIZE ]; then
+  echo "EPOCH_SIZE: $EPOCH_SIZE"
+else
+  echo "EPOCH_SIZE not set"
+  echo "Usage: $0 EPOCH_SIZE"
+  exit 1
+fi
+
 SRCLANG=en
 TGTLANG=zh
 
@@ -50,34 +58,14 @@ merge_and_shuf $DATA_DIR GEN
 
 echo "Shared Datasets"
 langpairs=$(awk -v srclang=$SRCLANG -v tgtlang=$TGTLANG \
-  '{printf "%s_%s-%s_%s",srclang,$2,tgtlang,$2}' $SOURCE_ROOT/DOMAIN_LIST.txt)
+  '{printf "%s_%s-%s_%s,",srclang,$2,tgtlang,$2}' $SOURCE_ROOT/DOMAIN_LIST.txt)
 # join by ','
-langpairs_str=$(echo $langpairs | paste -sd ',')
+langpairs_str=${langpairs::-1}
+echo $langpairs_str
 
 PYTHONPATH=${LANMT_TAINER_DIR}:${PYTHONPATH} \
 python ${LANMT_TAINER_DIR}/lanmttrainer/trainer/fairseq/shared_large_datasets.py \
   $TRAIN_DIR/data \
   --lang-pairs $langpairs_str \
   --epoch_sents $EPOCH_SIZE \
-  --trainpref train > /dev/null 2>&1
-
-# Shared large datasets into chunks
-total_sentences=$(find $TRAIN_DIR/data -type f -name "train.${SRCLANG}*" -exec cat {} + | wc -l)
-total_epoch=$[$total_sentences / $EPOCH_SIZE]
-echo "Toatal epochs: $total_epoch"
-
-for i in $(seq 0 $total_epoch); do
-  echo "Sharding $i/$total_epoch..."
-  for pair in $langpairs;do
-    # split by '-'
-    srclang=$(echo $pair | cut -d'-' -f1)
-    tgtlang=$(echo $pair | cut -d'-' -f2)
-    fairseq-preprocess --source-lang $srclang --target-lang tgtlang \
-        --trainpref $TRAIN_DIR/data/part${i}.train \
-        --validpref $TRAIN_DIR/data/valid \
-        --srcdict $TRAIN_DIR/data/fairseq.vocab \
-        --tgtdict $TRAIN_DIR/data/fairseq.vocab \
-        --destdir $TRAIN_DIR/data-bin/shard${i} \
-        --workers 30 > $TRAIN_DIR/data-bin-$SRCLANG-$TGTLANG/shard${i}/preprocess.log 2>&1
-  done
-done
+  --trainpref train

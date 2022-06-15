@@ -2,9 +2,30 @@ LANMT_TAINER_DIR=$(dirname $0)/../..
 source $LANMT_TAINER_DIR/lanmttrainer/shell_utils.sh
 SOURCE_ROOT=$(realpath $(dirname $0))
 
-NUM_SHARDS=$1
+MODE=$1
+NUM_SHARDS=$2
 SRCLANG=en
 TGTLANG=zh
+
+if [ ! -z "$MODE" || ! -z "$NUM_SHARDS" ]; then
+  echo "Usage: $0 <mode> <num_shards>"
+fi
+
+for i in $(seq 0 $total_epoch); do
+  echo "Sharding $i/$total_epoch..."
+  for pair in $langpairs;do
+    # split by '-'
+    srclang=$(echo $pair | cut -d'-' -f1)
+    tgtlang=$(echo $pair | cut -d'-' -f2)
+    fairseq-preprocess --source-lang $srclang --target-lang tgtlang \
+        --trainpref $TRAIN_DIR/data/part${i}.train \
+        --validpref $TRAIN_DIR/data/valid \
+        --srcdict $TRAIN_DIR/data/fairseq.vocab \
+        --tgtdict $TRAIN_DIR/data/fairseq.vocab \
+        --destdir $TRAIN_DIR/data-bin/shard${i} \
+        --workers 30 > $TRAIN_DIR/data-bin-$SRCLANG-$TGTLANG/shard${i}/preprocess.log 2>&1
+  done
+done
 
 PATH_TO_DATA="$TRAIN_DIR/data-bin/shard0"
 for i in `seq 1 $[${NUM_SHARDS}-1]`; do

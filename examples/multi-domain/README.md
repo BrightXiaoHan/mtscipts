@@ -73,7 +73,10 @@
 export DATA_DIR=/path/to/dataset
 
 # 指定eflomal的路径
-FLOMAL_PATH=/path/to/eflomal/
+export FLOMAL_PATH=/path/to/eflomal/
+
+# 指定模型训练目录
+export TRAIN_DIR=/path/to/train/dir
 ```
 
 清洗和准备语料
@@ -86,15 +89,28 @@ bash run_filter_opensource.sh
 ```
 
 使用CodeSwitch技术对语料进行扩充
-```
+```bash
 bash apply_codeswitch.sh
 ```
 
 训练分词模型
-```
+```bash
 bash tokenize.sh train
 ```
 分词（分词过程中使用Subword Regularzation对语料进行五倍扩充）
-```
+```bash
 bash tokenize.sh tokenize
+```
+
+数据合并、乱序、分片等预处理操作
+```bash
+# 每个分片的最大数据量为50000000
+bash preprocess.sh 50000000
+```
+
+使用fairseq进行模型训练
+```bash
+bash train.sh preprocess  # fairseq-preprocess
+bash train.sh train  # fairseq-train
+bash train.sh evaluate  # fairseq-generate
 ```
