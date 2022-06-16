@@ -107,10 +107,12 @@ bash tokenize.sh tokenize
 # 每个分片的最大数据量为50000000
 bash preprocess.sh 50000000
 ```
+- Note: `$TRAIN_DIR/data-bin-$SRCLANG-$TGTLANG`位置记录分片的数量，作为后面训练时的参数
+- TODO: 这里后面需要做的更自动化一点
 
 使用fairseq进行模型训练
 ```bash
-bash train.sh preprocess  # fairseq-preprocess
-bash train.sh train  # fairseq-train
-bash train.sh evaluate  # fairseq-generate
+bash train.sh preprocess $SHARED_NUM # fairseq-preprocess
+bash train.sh train $SHARED_NUM # fairseq-train
+bash train.sh eval  # fairseq-generate
 ```
