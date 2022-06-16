@@ -20,6 +20,7 @@ if [ "$MODE" == "preprocess" ]; then
 
   for i in $(seq 0 $[$NUM_SHARDS-1]); do
     echo "Sharding $[$i+1]/$NUM_SHARDS..."
+    rm -f $TRAIN_DIR/data-bin-${SRCLANG}-${TGTLANG}/shard${i}/preprocess.log
     for pair in $langpairs;do
       # split by '-'
       srclang=$(echo $pair | cut -d'-' -f1)
@@ -32,7 +33,11 @@ if [ "$MODE" == "preprocess" ]; then
           --srcdict $TRAIN_DIR/data/fairseq.vocab \
           --tgtdict $TRAIN_DIR/data/fairseq.vocab \
           --destdir $TRAIN_DIR/data-bin-${SRCLANG}-${TGTLANG}/shard${i} \
-          --workers 30 > $TRAIN_DIR/data-bin-${SRCLANG}-${TGTLANG}/shard${i}/preprocess.log 2>&1
+          --workers 30 >> $TRAIN_DIR/data-bin-${SRCLANG}-${TGTLANG}/shard${i}/preprocess.log 2>&1
+      if [ $? -ne 0 ]; then
+        echo "Error: training failed. Please check the log file."
+        exit 1
+      fi
     done
   done
 
