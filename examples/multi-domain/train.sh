@@ -74,9 +74,9 @@ elif [ "$MODE" == "train" ]; then
     --share-all-embeddings \
     --criterion label_smoothed_cross_entropy --label-smoothing 0.1 \
     --optimizer adam --adam-betas '(0.9, 0.98)' \
-    --lr-scheduler inverse_sqrt --lr 0.001 --warmup-updates 10000 --warmup-init-lr '1e-07' --max-update 1000000 \
+    --lr-scheduler inverse_sqrt --lr 0.001 --warmup-updates 4000 --warmup-init-lr '1e-07' --max-update 1000000 \
     --dropout 0.1 --attention-dropout 0.1 --weight-decay 0.0 \
-    --max-tokens 10000 --update-freq 16 \
+    --max-tokens 12000 --update-freq 16 \
     --save-interval 1 --keep-interval-updates 10 --keep-interval-updates-pattern 10 \
     --tensorboard-logdir "$TRAIN_DIR/tensorboard-${SRCLANG}-${TGTLANG}" \
     --seed 221 --log-format simple --log-interval 100 \

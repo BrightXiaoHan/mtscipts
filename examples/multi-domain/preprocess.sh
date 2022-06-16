@@ -41,9 +41,9 @@ function merge_and_shuf(){
   rm $TRAIN_DIR/data/train.${SRCLANG}_$domain.sort $TRAIN_DIR/data/train.${TGTLANG}_$domain.sort
 
   awk -v train="$TRAIN_DIR/data/valid.${SRCLANG}_$domain" -v test="$TRAIN_DIR/data/test.${SRCLANG}_$domain" \
-    '{if(rand()<0.5) {print > train} else {print > test}}' $folder/test.$SRCLANG
+    '{if(rand()<0.5) {print > train} else {print > test}}' $folder/test.$SRCLANG.spm
   awk -v train="$TRAIN_DIR/data/valid.${TGTLANG}_$domain" -v test="$TRAIN_DIR/data/test.${TGTLANG}_$domain" \
-    '{if(rand()<0.5) {print > train} else {print > test}}' $folder/test.$TGTLANG
+    '{if(rand()<0.5) {print > train} else {print > test}}' $folder/test.$TGTLANG.spm
 }
 
 for folder in $(find $DATA_DIR/online -maxdepth 2 -mindepth 2 -type d);do
