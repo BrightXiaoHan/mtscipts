@@ -24,14 +24,12 @@ electric-power DL
 nuclear HD
 power-transmission SBD
 new-energy XNY
-agriculture NY
 afaf NLMY
 chemical-drugs HXY
 biological-products SWZP
 medical-health YLWS
 chinese-medicine ZYY
 conference-exhibition HYHZ
-thesis QKLW
 enterprise-publicity QYXC
 social-science RWSK
 sports TYSS
@@ -39,9 +37,7 @@ tourism WHLY
 news XWCM
 industry-consultation HYZX
 government ZF
-semiconductor BDT
 internet HLW
-ai RZZN
 software RJ
 communication TX
 medical-equipment YLQX
