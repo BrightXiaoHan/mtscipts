@@ -90,6 +90,9 @@ general GEN
 # 其他测试集
 需要指定的环境变量
 ```bash
+# 指定原文语言，译文语言
+export SRCLANG=en
+export TGTLANG=zh
 # 指定环境变量为上面数据集的存放目录
 export DATA_DIR=/path/to/dataset
 

@@ -1,5 +1,8 @@
 LANMT_TAINER_DIR=$(dirname $0)/../..
 source $LANMT_TAINER_DIR/lanmttrainer/shell_utils.sh
+SOURCE_ROOT=$(realpath $(dirname $0))
+source $SOURCE_ROOT/env_check.sh
+
 MODE=${1:-train}
 
 if [ "$MODE" == "train" ]; then

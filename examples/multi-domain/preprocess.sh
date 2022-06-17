@@ -1,6 +1,7 @@
 LANMT_TAINER_DIR=$(dirname $0)/../..
 source $LANMT_TAINER_DIR/lanmttrainer/shell_utils.sh
 SOURCE_ROOT=$(realpath $(dirname $0))
+source $SOURCE_ROOT/env_check.sh
 
 EPOCH_SIZE=$1
 
@@ -11,9 +12,6 @@ else
   echo "Usage: $0 EPOCH_SIZE"
   exit 1
 fi
-
-SRCLANG=en
-TGTLANG=zh
 
 DATA_BIN_DIR="$DATA_DIR/data-bin/$SRCLANG-$TGTLANG"
 

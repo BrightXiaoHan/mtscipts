@@ -1,11 +1,10 @@
 LANMT_TAINER_DIR=$(dirname $0)/../..
 source $LANMT_TAINER_DIR/lanmttrainer/shell_utils.sh
 SOURCE_ROOT=$(realpath $(dirname $0))
+source $SOURCE_ROOT/env_check.sh
 
 MODE=$1
 NUM_SHARDS=$2
-SRCLANG=en
-TGTLANG=zh
 
 if [ -z "$MODE" ] || [ -z "$NUM_SHARDS" ]; then
   echo "Usage: $0 <mode> <num_shards>"

@@ -1,13 +1,7 @@
 LANMT_TAINER_DIR=$(dirname $0)/../..
 source $LANMT_TAINER_DIR/lanmttrainer/shell_utils.sh
-
-SOURCE_ROOT=$(dirname "${BASH_SOURCE[0]}")
-
-function pwait() {
-    while [ $(jobs -p | wc -l) -ge $1 ]; do
-        sleep 1
-    done
-}
+SOURCE_ROOT=$(realpath $(dirname $0))
+source $SOURCE_ROOT/env_check.sh
 
 function run() {
   folder=$1

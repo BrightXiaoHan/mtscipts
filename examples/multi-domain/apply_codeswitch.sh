@@ -1,11 +1,7 @@
 LANMT_TAINER_DIR=$(dirname $0)/../..
 source $LANMT_TAINER_DIR/lanmttrainer/shell_utils.sh
 SOURCE_ROOT=$(realpath $(dirname $0))
-
-if [ -z "$EFLOMAL_PATH" ]; then
-  echo "EFLOMAL_PATH is not set"
-  exit 1
-fi
+source $SOURCE_ROOT/env_check.sh
 
 function run() {
   folder=$1

@@ -1,7 +1,8 @@
 LANMT_TAINER_DIR=$(dirname $0)/../..
 source $LANMT_TAINER_DIR/lanmttrainer/shell_utils.sh
+SOURCE_ROOT=$(realpath $(dirname $0))
+source $SOURCE_ROOT/env_check.sh
 
-SOURCE_ROOT=$(dirname ${BASH_SOURCE[0]})
 # 移除旧的数据
 rm -f $DATA_DIR/raw.en $DATA_DIR/raw.zh
 rm -f $DATA_DIR/test.en $DATA_DIR/test.zh
