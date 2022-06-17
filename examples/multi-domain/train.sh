@@ -88,6 +88,38 @@ elif [ "$MODE" == "train" ]; then
     exit 1
   fi
   echo done
+elif [ "$MODE" == "eval" ]; then
+  model=${TRAIN_DIR}/checkpoints-$SRCLANG-$TGTLANG/checkpoint_best.pt
+  space_seperated_langpairs=$(awk -v srclang=$SRCLANG -v tgtlang=$TGTLANG \
+    '{printf "%s_%s-%s_%s ",srclang,$2,tgtlang,$2}' $SOURCE_ROOT/DOMAIN_LIST.txt)
+  langlist_file=$TRAIN_DIR/DOMAIN_LIST.${SRCLANG}-${TGTLANG}.txt
+  comma_seperated_langpairs=$(awk -v srclang=$SRCLANG -v tgtlang=$TGTLANG \
+    '{printf "%s_%s-%s_%s,",srclang,$2,tgtlang,$2}' $SOURCE_ROOT/DOMAIN_LIST.txt)
+  comma_seperated_langpairs=${comma_seperated_langpairs::-1}
+  
+  for pair in $space_seperated_langpairs;do
+    echo "Evaluating $pair..."
+    srclang=$(echo $pair | cut -d'-' -f1)
+    tgtlang=$(echo $pair | cut -d'-' -f2)
+    fairseq-generate $TRAIN_DIR/data-bin-${SRCLANG}-${TGTLANG}/shard0 \
+      --path $model \
+      --task translation_multi_simple_epoch \
+      --gen-subset test \
+      --source-lang $srclang \
+      --target-lang $tgtlang \
+      --lang-dict "$langlist_file" \
+      --lang-pairs "$comma_seperated_langpairs" \
+      --sacrebleu --remove-bpe 'sentencepiece'\
+      --batch-size 128 \
+      --beam 5 \
+      --decoder-langtok \
+      > $TRAIN_DIR/generated.${srclang}-${tgtlang}.txt 2>&1
+
+    if [ $? -ne 0 ]; then
+      echo "Error: evaluation failed. Please check the log file."
+      exit 1
+    fi
+  done
 else
   echo "Usage: $0 <mode> <num_shards>"
 fi
