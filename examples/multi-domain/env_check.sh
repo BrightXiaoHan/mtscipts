@@ -29,3 +29,11 @@ if [ -z "$EFLOMAL_PATH" ]; then
   echo "Please set EFLOMAL_PATH in the environment variables."
   exit 1
 fi
+
+
+# check terashuf
+if [ -z "$TERASHUF_PATH" -o -z "$MEMORY" ];then
+  echo "Please set TERASHUF_PATH and MEMORY in the environment variables."
+  exit 1
+fi
+

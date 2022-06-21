@@ -101,6 +101,12 @@ export FLOMAL_PATH=/path/to/eflomal/
 
 # 指定模型训练目录
 export TRAIN_DIR=/path/to/train/dir
+
+# 指定terashuf，在不占用内存的情况下乱序文件
+# 查看此连接安装 https://github.com/alexandres/terashuf
+# 指定安装目录为环境变量
+export TERASHUF_PATH=/path/to/terashuf/
+export MEMORY=20  # 指定乱序时最大的内存使用
 ```
 
 清洗和准备语料
