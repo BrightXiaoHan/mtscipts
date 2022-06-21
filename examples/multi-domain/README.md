@@ -17,7 +17,7 @@ thesis QKLW
 semiconductor BDT
 ai RZZN
 ```
-
+此为通用领域，没有划分到垂域的开源数据等都划分到通用领域
 ```
 general GEN
 ```

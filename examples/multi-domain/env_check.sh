@@ -37,3 +37,8 @@ if [ -z "$TERASHUF_PATH" -o -z "$MEMORY" ];then
   exit 1
 fi
 
+# check fairseq
+if [ -z "$FAIRSEQ_PATH" ]; then
+  echo "Please set FAIRSEQ_PATH in the environment variables."
+  exit 1
+fi
