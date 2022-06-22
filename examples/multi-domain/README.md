@@ -133,6 +133,8 @@ bash tokenize.sh tokenize
 ```
 
 数据合并、乱序、分片等预处理操作
+
+Note: 可以根据自己设备内存的大小，动态调整每个分片数据的最大数量
 ```bash
 # 每个分片的最大数据量为50000000
 bash preprocess.sh 50000000
@@ -141,6 +143,8 @@ bash preprocess.sh 50000000
 - TODO: 这里后面需要做的更自动化一点
 
 使用fairseq进行模型训练
+
+Note: `train.sh`脚本测试在4xA100 GPU上训练，如果在其他设备配置上训练，适当调整`--max-tokens`等参数
 ```bash
 bash train.sh preprocess $SHARED_NUM # fairseq-preprocess
 bash train.sh train $SHARED_NUM # fairseq-train
