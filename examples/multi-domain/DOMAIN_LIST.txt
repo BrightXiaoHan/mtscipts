@@ -41,6 +41,7 @@ software RJ
 communication TX
 medical-equipment YLQX
 hardware YJ
+game YX
 ship CB
 eleapp DQ
 rail-vehicle GDCL
@@ -48,5 +49,4 @@ aerospace HKHT
 mechanical JXSB
 military JG
 automobile QC
-game YX
 general GEN

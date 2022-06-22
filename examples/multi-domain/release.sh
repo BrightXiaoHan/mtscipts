@@ -12,11 +12,24 @@ python $FAIRSEQ_PATH/scripts/average_checkpoints.py \
     --output $TRAIN_DIR/checkpoints-${srclang}-${tgtlang}/average.pt \
     --num-epoch-checkpoints $everage_last_n_epochs
 
+iter_json_key()
+{
+  json_file=$1
+  cat $json_file | python3 -c \
+    "import sys, json; [print(key) for key in json.load(sys.stdin).keys()]"
+}
+
+translate_domain=""
+for domain in $(iter_json_key $SOURCE_ROOT/domain_mapping.json); do
+  translate_domain+="--translate_domain $domain "
+done
+
 if [ $SRC_LANG == "en" -a $TGTLANG == "zh" ]; then
   libtrans_release -m $TRAIN_DIR/checkpoints-${srclang}-${tgtlang}/average.pt \
       --data_dir $TRAIN_DIR/data-bin-${SRCLANG}-${TGTLANG}/shard0 \
       -o $OUTPUT_DIR -t fairseq -q float16  \
       --translate_lang_pairs ${SRCLANG}-${TGTLANG} \
+      --term_mask \
       --term_mask_methods CodeSwitch \
       --term_mask_methods Url \
       --term_mask_wrapper "【】" \
@@ -25,18 +38,25 @@ if [ $SRC_LANG == "en" -a $TGTLANG == "zh" ]; then
       --preprocess_pipeline uppercase \
       --preprocess_pipeline detruecase \
       --translate_prefix "lang_domain" \
-      --translate_domain ""
-
+      --translate_domain_prefix_mapping $SOURCE_ROOT/domain_mapping.json \
+      --translate_model_device cuda:0
+      $translate_domain
 
 elif [ $SRC_LANG == "zh" -a $TGTLANG == "en" ]; then
   libtrans_release -m $TRAIN_DIR/checkpoints-${srclang}-${tgtlang}/average.pt \
       --data_dir $TRAIN_DIR/data-bin-${SRCLANG}-${TGTLANG}/shard0 \
       -o $OUTPUT_DIR -t fairseq -q float16  \
       --translate_lang_pairs ${SRCLANG}-${TGTLANG} \
+      --term_mask \
       --term_mask_methods CodeSwitch \
       --term_mask_methods Url \
-      --term_mask_max_len 100
-
+      --term_mask_wrapper "[]" \
+      --postprocess_pipeline latinpunc \
+      --preprocess_pipeline normalize \
+      --translate_prefix "lang_domain" \
+      --translate_domain_prefix_mapping $SOURCE_ROOT/domain_mapping.json \
+      --translate_model_device cuda:0
+      $translate_domain
 else
   echo "Language pair $SRCLANG-$TGTLANG not supported."
   exit 1
