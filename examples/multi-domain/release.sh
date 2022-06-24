@@ -9,8 +9,8 @@ EVERAGE_LAST_N_EPOCHS=$2
 # everage checkpoints
 python $FAIRSEQ_PATH/scripts/average_checkpoints.py \
     --inputs $TRAIN_DIR/checkpoints-${SRCLANG}-${TGTLANG} \
-    --output $TRAIN_DIR/checkpoints-${srclang}-${tgtlang}/average.pt \
-    --num-epoch-checkpoints $everage_last_n_epochs
+    --output $TRAIN_DIR/checkpoints-${SRCLANG}-${TGTLANG}/average.pt \
+    --num-epoch-checkpoints $EVERAGE_LAST_N_EPOCHS
 
 iter_json_key()
 {
@@ -24,8 +24,9 @@ for domain in $(iter_json_key $SOURCE_ROOT/domain_mapping.json); do
   translate_domain+="--translate_domain $domain "
 done
 
-if [ $SRC_LANG == "en" -a $TGTLANG == "zh" ]; then
-  libtrans_release -m $TRAIN_DIR/checkpoints-${srclang}-${tgtlang}/average.pt \
+
+if [[ "$SRCLANG" == "en" ]] && [[ "$TGTLANG" == "zh" ]]; then
+  libtranslate release -m $TRAIN_DIR/checkpoints-${SRCLANG}-${TGTLANG}/average.pt \
       --data_dir $TRAIN_DIR/data-bin-${SRCLANG}-${TGTLANG}/shard0 \
       -o $OUTPUT_DIR -t fairseq -q float16  \
       --translate_lang_pairs ${SRCLANG}-${TGTLANG} \
@@ -37,13 +38,15 @@ if [ $SRC_LANG == "en" -a $TGTLANG == "zh" ]; then
       --preprocess_pipeline normalize \
       --preprocess_pipeline uppercase \
       --preprocess_pipeline detruecase \
-      --translate_prefix "lang_domain" \
+      --translate_target_prefix "lang_domain" \
       --translate_domain_prefix_mapping $SOURCE_ROOT/domain_mapping.json \
-      --translate_model_device cuda:0
+      --translate_language_prefix_mapping $SOURCE_ROOT/lang_mapping.json \
+      --translate_model_device cuda:0 \
+      --spm_model $DATA_DIR/spm.model \
       $translate_domain
 
-elif [ $SRC_LANG == "zh" -a $TGTLANG == "en" ]; then
-  libtrans_release -m $TRAIN_DIR/checkpoints-${srclang}-${tgtlang}/average.pt \
+elif [[ "$SRCLANG" == "zh" ]] && [[ "$TGTLANG" == "en" ]]; then
+  libtranslate release -m $TRAIN_DIR/checkpoints-${SRCLANG}-${TGTLANG}/average.pt \
       --data_dir $TRAIN_DIR/data-bin-${SRCLANG}-${TGTLANG}/shard0 \
       -o $OUTPUT_DIR -t fairseq -q float16  \
       --translate_lang_pairs ${SRCLANG}-${TGTLANG} \
@@ -51,11 +54,15 @@ elif [ $SRC_LANG == "zh" -a $TGTLANG == "en" ]; then
       --term_mask_methods CodeSwitch \
       --term_mask_methods Url \
       --term_mask_wrapper "[]" \
+      --term_mask_file $SOURCE_ROOT/countries.tsv \
+      --term_mask_chinese_name_exclude_file $SOURCE_ROOT/names.tsv \
       --postprocess_pipeline latinpunc \
       --preprocess_pipeline normalize \
-      --translate_prefix "lang_domain" \
+      --translate_target_prefix "lang_domain" \
       --translate_domain_prefix_mapping $SOURCE_ROOT/domain_mapping.json \
-      --translate_model_device cuda:0
+      --translate_language_prefix_mapping $SOURCE_ROOT/lang_mapping.json \
+      --translate_model_device cuda:0 \
+      --spm_model $DATA_DIR/spm.model \
       $translate_domain
 else
   echo "Language pair $SRCLANG-$TGTLANG not supported."
