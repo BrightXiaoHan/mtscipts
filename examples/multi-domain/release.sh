@@ -28,9 +28,10 @@ done
 if [[ "$SRCLANG" == "en" ]] && [[ "$TGTLANG" == "zh" ]]; then
   libtranslate release -m $TRAIN_DIR/checkpoints-${SRCLANG}-${TGTLANG}/average.pt \
       --data_dir $TRAIN_DIR/data-bin-${SRCLANG}-${TGTLANG}/shard0 \
-      -o $OUTPUT_DIR -t fairseq -q float16  \
+      -o $OUTPUT_DIR -t fairseq  \
+      --max_sent_len 150 \
+      --translate_beam_size 5 \
       --translate_lang_pairs ${SRCLANG}-${TGTLANG} \
-      --term_mask \
       --term_mask_methods CodeSwitch \
       --term_mask_methods Url \
       --term_mask_wrapper "【】" \
@@ -48,9 +49,10 @@ if [[ "$SRCLANG" == "en" ]] && [[ "$TGTLANG" == "zh" ]]; then
 elif [[ "$SRCLANG" == "zh" ]] && [[ "$TGTLANG" == "en" ]]; then
   libtranslate release -m $TRAIN_DIR/checkpoints-${SRCLANG}-${TGTLANG}/average.pt \
       --data_dir $TRAIN_DIR/data-bin-${SRCLANG}-${TGTLANG}/shard0 \
-      -o $OUTPUT_DIR -t fairseq -q float16  \
+      -o $OUTPUT_DIR -t fairseq \
+      --max_sent_len 150 \
+      --translate_beam_size 5 \
       --translate_lang_pairs ${SRCLANG}-${TGTLANG} \
-      --term_mask \
       --term_mask_methods CodeSwitch \
       --term_mask_methods Url \
       --term_mask_wrapper "[]" \

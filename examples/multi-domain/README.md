@@ -87,7 +87,7 @@ general GEN
 │       └── zh
 ```
 
-# 其他测试集
+## 训练模型
 需要指定的环境变量
 ```bash
 # 指定原文语言，译文语言
@@ -149,4 +149,14 @@ Note: `train.sh`脚本测试在4xA100 GPU上训练，如果在其他设备配置
 bash train.sh preprocess $SHARED_NUM # fairseq-preprocess
 bash train.sh train $SHARED_NUM # fairseq-train
 bash train.sh eval  # fairseq-generate
+```
+
+## 参加wmt2022
+TODO
+
+## 评测与部署
+发布模型
+```
+# 第一个参数是模型输出的目录位置，第二个参数是将最后几个checkpoints进行平均
+bash release.sh /path/to/output_dir n_everage
 ```
