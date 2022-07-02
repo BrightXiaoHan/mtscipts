@@ -7,3 +7,5 @@ ru
 uk
 zh
 en
+sah
+liv

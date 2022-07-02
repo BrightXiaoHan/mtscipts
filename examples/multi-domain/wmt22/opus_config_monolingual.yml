@@ -1,0 +1,63 @@
+common:
+  output_directory: .
+  chunksize: 1000000
+
+steps:
+  - type: remove_duplicates
+    parameters:
+      inputs: [news.zh]
+      outputs: [news.zh.dedup]
+
+  - type: filter
+    parameters:
+      inputs: [zh.dedup]
+      outputs: [zh.rules, en.rules]
+      filterfalse: false
+      filters:
+        - LengthFilter:
+            unit: [char]
+            min_length: 10
+            max_length: 200
+        - CharacterScoreFilter:
+            scripts: [Han]
+            thresholds: [0.8]
+        - HtmlTagFilter:
+
+        - LanguageIDFilter:
+          languages: zh
+          id_method: fasttext
+          thresholds: [0.5]
+          fasttext_model_path: 
+ 
+
+  - type: remove_duplicates
+    parameters:
+      inputs: [news.en]
+      outputs: [news.en.dedup]
+
+
+  - type: filter
+    parameters:
+      inputs: [zh.dedup]
+      outputs: [zh.rules, en.rules]
+      filterfalse: false
+      filters:
+        - LengthFilter:
+            unit: [word]
+            min_length: 10
+            max_length: 150
+        - CharacterScoreFilter:
+            scripts: [Latin]
+            thresholds: [1]
+        - LongWordFilter:
+          threshold: 20
+
+        - AlphabetRatioFilter:
+          exclude_whitespace: true
+          threshold: 0.8
+
+        - LanguageIDFilter:
+          languages: en
+          id_method: fasttext
+          thresholds: [0.5]
+          fasttext_model_path: 

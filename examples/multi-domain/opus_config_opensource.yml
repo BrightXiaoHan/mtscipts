@@ -22,7 +22,7 @@ steps:
             scripts: [Han, Latin]
             thresholds: [0.5, 0.8]
         - SimilarityFilter:
-            unit: char
+            unit: [char, word]
         - RegExpFilter:
             regexps: [".*[\\u4E00-\\u9FA5]+.*", ".*[A-Za-z]+.*"]
             accept_match: true
