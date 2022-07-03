@@ -97,7 +97,7 @@ export TGTLANG=zh
 export DATA_DIR=/path/to/dataset
 
 # 指定eflomal的路径
-export FLOMAL_PATH=/path/to/eflomal/
+export EFLOMAL_PATH=/path/to/eflomal/
 
 # 指定模型训练目录
 export TRAIN_DIR=/path/to/train/dir

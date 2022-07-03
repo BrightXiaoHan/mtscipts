@@ -1,6 +1,6 @@
-LANMT_TAINER_DIR=$(dirname $0)/../..
+LANMT_TAINER_DIR=$(dirname $0)/../../..
 source $LANMT_TAINER_DIR/lanmttrainer/shell_utils.sh
-SOURCE_ROOT=$(realpath $(dirname $0))
+SOURCE_ROOT=$(realpath $(dirname $0))/..
 source $SOURCE_ROOT/env_check.sh
 
 OUTPUT_DIR=$1

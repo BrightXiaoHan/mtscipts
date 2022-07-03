@@ -1,18 +1,18 @@
 common:
   output_directory: .
-  chunksize: 1000000
 
 steps:
   - type: remove_duplicates
     parameters:
-      inputs: [news.zh]
-      outputs: [news.zh.dedup]
+      inputs: [zh.news]
+      outputs: [zh.dedup]
 
   - type: filter
     parameters:
       inputs: [zh.dedup]
-      outputs: [zh.rules, en.rules]
+      outputs: [zh.rules]
       filterfalse: false
+      n_jobs: 10
       filters:
         - LengthFilter:
             unit: [char]
@@ -21,26 +21,25 @@ steps:
         - CharacterScoreFilter:
             scripts: [Han]
             thresholds: [0.8]
-        - HtmlTagFilter:
-
         - LanguageIDFilter:
-          languages: zh
-          id_method: fasttext
-          thresholds: [0.5]
-          fasttext_model_path: 
+            languages: [zh]
+            id_method: fasttext
+            thresholds: [0.5]
+            fasttext_model_path: lid.176.bin
  
 
   - type: remove_duplicates
     parameters:
-      inputs: [news.en]
-      outputs: [news.en.dedup]
+      inputs: [en.news]
+      outputs: [en.dedup]
 
 
   - type: filter
     parameters:
-      inputs: [zh.dedup]
-      outputs: [zh.rules, en.rules]
+      inputs: [en.dedup]
+      outputs: [en.rules]
       filterfalse: false
+      n_jobs: 20
       filters:
         - LengthFilter:
             unit: [word]
@@ -48,16 +47,16 @@ steps:
             max_length: 150
         - CharacterScoreFilter:
             scripts: [Latin]
-            thresholds: [1]
+            thresholds: [0.8]
         - LongWordFilter:
-          threshold: 20
+            threshold: 20
 
         - AlphabetRatioFilter:
-          exclude_whitespace: true
-          threshold: 0.8
+            exclude_whitespace: true
+            threshold: 0.8
 
         - LanguageIDFilter:
-          languages: en
-          id_method: fasttext
-          thresholds: [0.5]
-          fasttext_model_path: 
+            languages: [en]
+            id_method: fasttext
+            thresholds: [0.5]
+            fasttext_model_path: lid.176.bin
