@@ -31,7 +31,7 @@ for pair in $(cat $LANGPAIRS_FILE); do
   if [ ! -f "lid.176.bin" ]; then
     ln $SOURCE_ROOT/lid.176.bin .
   fi
-  opusfilter $opus_config_file
+  opusfilter $opus_config_file > /dev/null 2>&1
   cd -
 
 done
