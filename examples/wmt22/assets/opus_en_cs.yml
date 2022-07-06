@@ -1,0 +1,38 @@
+common:
+  output_directory: .
+
+steps:
+  - type: remove_duplicates
+    parameters:
+      inputs: [cs, en]
+      outputs: [cs.dedump ,en.dedump]
+
+  - type: filter
+    parameters:
+      inputs: [cs.dedump, en.dedump]
+      outputs: [cs.rules, en.rules]
+      filterfalse: false
+      n_jobs: 20
+      filters:
+        - LengthFilter:
+            unit: [word, word]
+            min_length: 1
+            max_length: 250
+        - LengthRatioFilter:
+            unit: word
+            threshold: 3
+        - LongWordFilter:
+            threshold: 40
+        - LanguageIDFilter:
+            languages: [cs, en]
+            id_method: fasttext
+            thresholds: [0.5]
+            fasttext_model_path: lid.176.bin
+
+  - type: preprocess
+    parameters:
+      inputs: [cs.rules, en.rules]
+      outputs: [cs.final, en.final]
+      n_jobs: 30
+      preprocessors:
+        - MosesNormalizer: {}

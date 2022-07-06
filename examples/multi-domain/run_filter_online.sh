@@ -1,14 +1,6 @@
 LANMT_TAINER_DIR=$(dirname $0)/../..
 source $LANMT_TAINER_DIR/lanmttrainer/shell_utils.sh
-SOURCE_ROOT=$(realpath $(dirname $0))
-source $SOURCE_ROOT/env_check.sh
-
-function run() {
-  folder=$1
-  cd $folder
-  opusfilter $SOURCE_ROOT/opus_config_online.yml
-  
-  if [ $? -eq 0 ]; then
+SOURCE_ROOT=$(realpath $(dirname $0)) source $SOURCE_ROOT/env_check.sh function run() { folder=$1 cd $folder opusfilter $SOURCE_ROOT/opus_config_online.yml if [ $? -eq 0 ]; then
     echo "Successfully filtered $folder"
   else
     echo "Failed to filter $folder"
