@@ -25,8 +25,9 @@ if [ ! -d "${TRAIN_DIR}" ]; then
   mkdir -p ${TRAIN_DIR}
 fi
 
-if [ ! -z "${MODE}" ]; then
+if [ -z "${MODE}" ]; then
   echo "Please set MODE in the environment variables. Avaliable MODE is X2EN or EN2X"
+  exit 1
 fi
 
 if [ "$MODE" == "X2EN" ]; then

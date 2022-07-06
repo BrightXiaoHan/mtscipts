@@ -15,15 +15,20 @@ for pair in $(cat $LANGPAIRS_FILE); do
   
   opus_config_file=$SOURCE_ROOT/assets/opus_${srclang}_${tgtlang}.yml
   if [ ! -f $opus_config_file ]; then
-    opus_config_file=$SOURCE_ROOT/assets/opus_${tgtlang}_${srclang}.yml > /dev/null 2>&1
+    opus_config_file=$SOURCE_ROOT/assets/opus_${tgtlang}_${srclang}.yml
   fi
 
   echo "Clearing $pair..."
-  cd $DATA_DIR/$pair
+  if [ -d "$DATA_DIR/$pair" ]; then
+    cd $DATA_DIR/$pair
+  else
+    cd $DATA_DIR/${tgtlang}-${srclang}
+  fi
+
   if [ ! -f "lid.176.bin" ]; then
     ln $SOURCE_ROOT/lid.176.bin .
   fi
-  opusfilter $opus_config_file
+  opusfilter $opus_config_file > /dev/null 2>&1
   cd -
 
   echo "Clearing $pair BT data..."

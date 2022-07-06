@@ -1,8 +1,7 @@
-if [ -z "${DATA_DIR}" ]; then
-  echo "Please set DATA_DIR in the environment variables."
-  exit 1
-fi
 LANMT_TAINER_DIR=$(dirname $0)/../..
+source $LANMT_TAINER_DIR/lanmttrainer/shell_utils.sh
+SOURCE_ROOT=$(realpath $(dirname $0))
+source $SOURCE_ROOT/env_check.sh
 
 echo "Joining all the English files together..."
 cat $(find $DATA_DIR -name 'train.en.final') > $DATA_DIR/merged.en
@@ -22,7 +21,7 @@ python ${LANMT_TAINER_DIR}/lanmttrainer/preprocessor/train_multilingual_spm_mode
   -c $DATA_DIR/wmt22-ruen/train.ru.final -l ru \
   -c $DATA_DIR/wmt22-uken/train.uk.final -l uk \
   -c $DATA_DIR/wmt22-zhen/train.zh.final -l zh \
-  --vocab-size 100000 \
+  --vocab-size 10000 \
   --input-sentence-size 20000000 \
   --sample-temprature 2 \
   -o $DATA_DIR/spm
