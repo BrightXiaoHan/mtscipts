@@ -14,10 +14,10 @@ function train_spm(){
   for lang in $(cat $SOURCE_ROOT/WMT22-LANGS.txt);
   do
     echo "Merge and shuffle $lang files."
-    # allfiles=$(find $DATA_DIR -type f -name "${lang}.final")
-    # cat $allfiles > $TRAIN_DIR/${lang}.all
-    # $TERASHUF_PATH/terashuf < $TRAIN_DIR/${lang}.all > $TRAIN_DIR/${lang}.shuf 2>/dev/null
-    # rm $TRAIN_DIR/${lang}.all
+    allfiles=$(find $DATA_DIR -type f -name "${lang}.final")
+    cat $allfiles > $TRAIN_DIR/${lang}.all
+    $TERASHUF_PATH/terashuf < $TRAIN_DIR/${lang}.all > $TRAIN_DIR/${lang}.shuf 2>/dev/null
+    rm $TRAIN_DIR/${lang}.all
     params="-c $TRAIN_DIR/${lang}.shuf -l $lang $params"
   done
 
