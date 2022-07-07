@@ -1,9 +1,7 @@
 cs
 de
-fr
 hr
 ja
 ru
 uk
-zh
 en

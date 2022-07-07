@@ -1,43 +1,53 @@
-if [ -z "${DATA_DIR}" ]; then
-  echo "Please set DATA_DIR in the environment variables."
+LANMT_TAINER_DIR=$(dirname $0)/../..
+source $LANMT_TAINER_DIR/lanmttrainer/shell_utils.sh
+SOURCE_ROOT=$(realpath $(dirname $0))
+source $SOURCE_ROOT/env_check.sh
+
+SPM_MODEL=$TRAIN_DIR/spm.model
+
+function train_spm(){
+  if [ -f $SPM_MODEL ]; then
+    echo "SPM model exists, skip training"
+    exit 0
+  fi
+  params=""
+  for lang in $(cat $SOURCE_ROOT/WMT22-LANGS.txt);
+  do
+    echo "Merge and shuffle $lang files."
+    allfiles=$(find $DATA_DIR -type f -name "${lang}.final")
+    cat $allfiles > $TRAIN_DIR/${lang}.all
+    $TERASHUF_PATH/terashuf < $TRAIN_DIR/${lang}.all > $TRAIN_DIR/${lang}.shuf 2>/dev/null
+    rm $TRAIN_DIR/${lang}.all
+    params="-c $TRAIN_DIR/${lang}.shuf -l $lang $params"
+  done
+
+  echo "Training sentencepiece model..."
+  PYTHONPATH=${LANMT_TAINER_DIR}:${PYTHONPATH} \
+  python ${LANMT_TAINER_DIR}/lanmttrainer/preprocessor/train_multilingual_spm_model.py \
+    $params \
+    --vocab-size 10000 \
+    --input-sentence-size 20000000 \
+    --sample-temprature 2 \
+    -o $DATA_DIR/spm
+}
+
+function tokenize_all(){
+  for file in $(find $DATA_DIR $BT_DATA_DIR $TEST_DATA_DIR -type f -name "*.final");
+  do
+    if [ -f $file.spm ];then
+      echo "Skip tokenizing $file, $file.spm exists."
+      continue
+    fi
+    spm_encode --model=$SPM_MODEL --output_format=piece < $file > $file.spm
+  done
+}
+
+MODE=$1
+if [ "$MODE" == "train" ]; then
+  train_spm
+elif [ "$MODE" == "tokenize" ]; then
+  tokenize_all
+else
+  echo "Usage: $0 [train|tokenize]"
   exit 1
 fi
-
-if [ ! -d $DATA_DIR/data ]; then
-    mkdir $DATA_DIR/data
-fi
-
-echo "Tokenizing training data..."
-for lang in cs de hr ja ru uk zh; do
-  echo "Tokenizing $lang corpus..."
-  spm_encode --model=$DATA_DIR/spm.model --output_format=sample_piece < $DATA_DIR/wmt22-${lang}en/train.${lang}.final > $DATA_DIR/data/train.${lang}-en.${lang} &
-  spm_encode --model=$DATA_DIR/spm.model --output_format=sample_piece < $DATA_DIR/wmt22-${lang}en/train.en.final > $DATA_DIR/data/train.${lang}-en.en &
-done
-wait
-echo "Done."
-
-echo "Tokenizing dev data..."
-spm_encode --model=$DATA_DIR/spm.model --output_format=piece < $DATA_DIR/wmt22-csen/dev.ces > $DATA_DIR/data/dev.cs-en.cs
-spm_encode --model=$DATA_DIR/spm.model --output_format=piece < $DATA_DIR/wmt22-csen/dev.eng > $DATA_DIR/data/dev.cs-en.en
-
-spm_encode --model=$DATA_DIR/spm.model --output_format=piece < $DATA_DIR/wmt22-deen/dev.deu > $DATA_DIR/data/dev.de-en.de
-spm_encode --model=$DATA_DIR/spm.model --output_format=piece < $DATA_DIR/wmt22-deen/dev.eng > $DATA_DIR/data/dev.de-en.en
-
-spm_encode --model=$DATA_DIR/spm.model --output_format=piece < $DATA_DIR/wmt22-jaen/dev.jpn > $DATA_DIR/data/dev.ja-en.ja
-spm_encode --model=$DATA_DIR/spm.model --output_format=piece < $DATA_DIR/wmt22-jaen/dev.eng > $DATA_DIR/data/dev.ja-en.en
-
-spm_encode --model=$DATA_DIR/spm.model --output_format=piece < $DATA_DIR/wmt22-ruen/dev.rus > $DATA_DIR/data/dev.ru-en.ru
-spm_encode --model=$DATA_DIR/spm.model --output_format=piece < $DATA_DIR/wmt22-ruen/dev.eng > $DATA_DIR/data/dev.ru-en.en
-
-spm_encode --model=$DATA_DIR/spm.model --output_format=piece < $DATA_DIR/wmt22-zhen/dev.zho > $DATA_DIR/data/dev.zh-en.zh
-spm_encode --model=$DATA_DIR/spm.model --output_format=piece < $DATA_DIR/wmt22-zhen/dev.eng > $DATA_DIR/data/dev.zh-en.en
-
-# floresdata
-spm_encode --model=$DATA_DIR/spm.model --output_format=piece < $DATA_DIR/flores101/dev/hrv.dev > $DATA_DIR/data/dev.hr-en.hr
-spm_encode --model=$DATA_DIR/spm.model --output_format=piece < $DATA_DIR/flores101/dev/eng.dev > $DATA_DIR/data/dev.hr-en.en
-
-spm_encode --model=$DATA_DIR/spm.model --output_format=piece < $DATA_DIR/flores101/dev/ukr.dev > $DATA_DIR/data/dev.uk-en.uk
-spm_encode --model=$DATA_DIR/spm.model --output_format=piece < $DATA_DIR/flores101/dev/eng.dev > $DATA_DIR/data/dev.uk-en.en
-
-echo "Done."
-

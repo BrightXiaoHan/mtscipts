@@ -10,7 +10,7 @@ steps:
   - type: filter
     parameters:
       inputs: [ja.dedump, en.dedump]
-      outputs: [ja.final, en.rules]
+      outputs: [ja.rules, en.rules]
       filterfalse: false
       n_jobs: 20
       filters:
@@ -28,8 +28,8 @@ steps:
 
   - type: preprocess
     parameters:
-      inputs: [en.rules]
-      outputs: [en.final]
+      inputs: [ja.rules, en.rules]
+      outputs: [ja.final, en.final]
       n_jobs: 30
       preprocessors:
         - MosesNormalizer: {}
