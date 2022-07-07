@@ -4,44 +4,81 @@ SOURCE_ROOT=$(realpath $(dirname $0))
 source $SOURCE_ROOT/env_check.sh
 
 echo "Merging all training data togather"
-cat $(find $DATA_DIR/data -name "train.*.en") > $DATA_DIR/train.en
-cat $(find $DATA_DIR/data -name "train.*" ! -name "train.*.en") > $DATA_DIR/train.ot
+source_file=$TRAIN_DIR/train.src
+target_file=$TRAIN_DIR/train.tgt
+rm -f $source_file $target_file
+for pair in $(cat $LANGPAIRS_FILE); do
+  srclang=$(echo $pair | cut -d '-' -f 1)
+  tgtlang=$(echo $pair | cut -d '-' -f 2)
+  cat $BT_DATA_DIR/$pair/$srclang.final.spm >> $source_file
+  cat $BT_DATA_DIR/$pair/$tgtlang.final.spm >> $target_file
+  if [ ! -d "$DATA_DIR/$pair" ]; then
+    pair=${tgtlang}-${srclang}
+  fi
+  cat $DATA_DIR/$pair/$srclang.final.spm >> $source_file
+  cat $DATA_DIR/$pair/$tgtlang.final.spm >> $target_file
+done
+
 
 echo "Building vocabulary"
 # Prapre for vocabularies
-fairseq-preprocess --source-lang ot --target-lang en \
-    --trainpref $DATA_DIR/train \
+fairseq-preprocess --source-lang src --target-lang tgt \
+    --trainpref $TRAIN_DIR/train \
     --dict-only \
     --joined-dictionary \
     --thresholdtgt 10 --thresholdsrc 10 \
-    --destdir $DATA_DIR/data-bin \
-    --workers 30
+    --destdir $TRAIN_DIR/data-bin \
+    --workers 40
 
+LANGPAIRS=""
+for pair in $(cat $LANGPAIRS_FILE); do
+  LANGPAIRS="$pair $LANGPAIRS"
+  srclang=$(echo $pair | cut -d '-' -f 1)
+  tgtlang=$(echo $pair | cut -d '-' -f 2)
+  ln $TEST_DATA_DIR/$
+  prefix=$TRAIN_DIR/train.$pair
+  srcfile=$prefix.$srclang
+  tgtfile=$prefix.$tgtlang
+  cat $BT_DATA_DIR/$pair/$srclang.final.spm > $srcfile
+  cat $BT_DATA_DIR/$pair/$tgtlang.final.spm > $tgtfile
+  if [ ! -d "$DATA_DIR/$pair" ]; then
+    pair=${tgtlang}-${srclang}
+  fi
+  cat $DATA_DIR/$pair/$srclang.final.spm >> $srcfile
+  cat $DATA_DIR/$pair/$tgtlang.final.spm >> $tgtfile
 
-echo "Shared Datasets"
-LANMT_TAINER_DIR=$(dirname $0)/../..
-
-PYTHONPATH=${LANMT_TAINER_DIR}:${PYTHONPATH} \
-python ${LANMT_TAINER_DIR}/lanmttrainer/trainer/fairseq/shared_large_datasets.py \
-  $DATA_DIR/data \
-  --lang-pairs "cs-en,de-en,hr-en,ja-en,uk-en,zh-en,ru-en" \
-  --epoch_sents 50000000 \
-  --trainpref train
-
+  paste $srcfile $tgtfile > $prefix.merge
+  rm $srcfile $tgtfile
+  $TERASHUF_PATH/terashuf < $prefix.merge > $prefix.shuf 2>/dev/null
+  rm $prefix.merge
+  cut -f 1 $prefix.shuf > $srcfile
+  cut -f 2 $prefix.shuf > $tgtfile
+done
 
 EPOCH_SIZE=50000000
 
+PYTHONPATH=${LANMT_TAINER_DIR}:${PYTHONPATH} \
+python ${LANMT_TAINER_DIR}/lanmttrainer/trainer/fairseq/shared_large_datasets.py \
+  $TRAIN_DIR \
+  --lang-pairs $LANGPAIRS \
+  --epoch_sents $EPOCH_SIZE \
+  --trainpref train \
+  --suffix_pair
+
 # Shared large datasets into chunks
-total_sentences=$(wc -l < $DATA_DIR/train.en)
-total_epoch=$[$total_sentences / 50000000]
+num_pairs=$(cat $LANGPAIRS_FILE | wc -l)
+num_parts=$(find $TRAIN_DIR -type f - name part*.train.* | wc -l)
+total_epoch=$[$num_pairs / $num_pairs / 2]
 echo $total_epoch
 
 for i in $(seq 0 $total_epoch); do
   echo "Sharding $i/$total_epoch..."
-  for lang in cs de hr ja uk zh ru;do
-    fairseq-preprocess --source-lang ${lang} --target-lang en \
-        --trainpref $DATA_DIR/data/part${i}.train.${lang}-en \
-        --validpref $DATA_DIR/data/dev.${lang}-en \
+  for pair in $(cat $LANGPAIRS_FILE); do
+    srclang=$(echo $pair | cut -d '-' -f 1)
+    tgtlang=$(echo $pair | cut -d '-' -f 2)
+    fairseq-preprocess --source-lang $srclang --target-lang $tgtlang \
+        --trainpref $TRAIN_DIR/part${i}.train.${lang}-en \
+        --validpref $TRAIN_DIR/data/dev.${lang}-en \
         --srcdict $DATA_DIR/data-bin/dict.ot.txt \
         --tgtdict $DATA_DIR/data-bin/dict.en.txt \
         --destdir $DATA_DIR/data-bin/shard${i} \

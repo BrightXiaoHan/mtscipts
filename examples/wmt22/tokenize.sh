@@ -33,7 +33,7 @@ function train_spm(){
 }
 
 function tokenize_all(){
-  for file in $(find $DATA_DIR $BT_DATA_DIR $TEST_DATA_DIR -type f -name "*.final");
+  for file in $(find $DATA_DIR $BT_DATA_DIR -type f -name "*.final");
   do
     if [ -f $file.spm ];then
       echo "Skip tokenizing $file, $file.spm exists."
@@ -41,6 +41,11 @@ function tokenize_all(){
     fi
     spm_encode --model=$SPM_MODEL_PREFIX.model --output_format=piece < $file > $file.spm &
     pwait 20
+  done
+
+  for file in $(find $TEST_DATA_DIR -type f ! -name "*.spm");
+  do
+    spm_encode --model=$SPM_MODEL_PREFIX.model --output_format=piece < $file > $file.spm
   done
 }
 
