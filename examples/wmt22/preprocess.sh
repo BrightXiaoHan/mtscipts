@@ -1,7 +1,7 @@
-if [ -z "${DATA_DIR}" ]; then
-  echo "Please set DATA_DIR in the environment variables."
-  exit 1
-fi
+LANMT_TAINER_DIR=$(dirname $0)/../..
+source $LANMT_TAINER_DIR/lanmttrainer/shell_utils.sh
+SOURCE_ROOT=$(realpath $(dirname $0))
+source $SOURCE_ROOT/env_check.sh
 
 echo "Merging all training data togather"
 cat $(find $DATA_DIR/data -name "train.*.en") > $DATA_DIR/train.en
