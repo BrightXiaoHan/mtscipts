@@ -35,7 +35,8 @@ for pair in $(cat $LANGPAIRS_FILE); do
   LANGPAIRS="$pair $LANGPAIRS"
   srclang=$(echo $pair | cut -d '-' -f 1)
   tgtlang=$(echo $pair | cut -d '-' -f 2)
-  ln $TEST_DATA_DIR/$
+  ln $TEST_DATA_DIR/$srclang.spm $TRAIN_DIR/valid.$pair
+  ln $TEST_DATA_DIR/$tgtlang.spm $TRAIN_DIR/valid.$pair
   prefix=$TRAIN_DIR/train.$pair
   srcfile=$prefix.$srclang
   tgtfile=$prefix.$tgtlang
@@ -77,11 +78,12 @@ for i in $(seq 0 $total_epoch); do
     srclang=$(echo $pair | cut -d '-' -f 1)
     tgtlang=$(echo $pair | cut -d '-' -f 2)
     fairseq-preprocess --source-lang $srclang --target-lang $tgtlang \
-        --trainpref $TRAIN_DIR/part${i}.train.${lang}-en \
-        --validpref $TRAIN_DIR/data/dev.${lang}-en \
-        --srcdict $DATA_DIR/data-bin/dict.ot.txt \
-        --tgtdict $DATA_DIR/data-bin/dict.en.txt \
-        --destdir $DATA_DIR/data-bin/shard${i} \
-        --workers 30
+        --trainpref $TRAIN_DIR/part${i}.train.$pair \
+        --validpref $TRAIN_DIR/valid.$pair \
+        --srcdict $TRAIN_DIR/data-bin/dict.src.txt \
+        --tgtdict $TRAIN_DIR/data-bin/dict.tgt.txt \
+        --joined-dictionary \
+        --destdir $TRAIN_DIR/data-bin/shard${i} \
+        --workers 40
   done
 done
