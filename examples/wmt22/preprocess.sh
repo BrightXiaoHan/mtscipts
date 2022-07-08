@@ -32,11 +32,12 @@ fairseq-preprocess --source-lang src --target-lang tgt \
 
 LANGPAIRS=""
 for pair in $(cat $LANGPAIRS_FILE); do
-  LANGPAIRS="$pair $LANGPAIRS"
+  echo "Merge and shuf $pair data."
+  LANGPAIRS="$pair,$LANGPAIRS"
   srclang=$(echo $pair | cut -d '-' -f 1)
   tgtlang=$(echo $pair | cut -d '-' -f 2)
-  ln $TEST_DATA_DIR/$srclang.spm $TRAIN_DIR/valid.$pair
-  ln $TEST_DATA_DIR/$tgtlang.spm $TRAIN_DIR/valid.$pair
+  cp $TEST_DATA_DIR/$pair/$srclang.spm $TRAIN_DIR/valid.$pair.$srclang
+  cp $TEST_DATA_DIR/$pair/$tgtlang.spm $TRAIN_DIR/valid.$pair.$tgtlang
   prefix=$TRAIN_DIR/train.$pair
   srcfile=$prefix.$srclang
   tgtfile=$prefix.$tgtlang
@@ -54,7 +55,10 @@ for pair in $(cat $LANGPAIRS_FILE); do
   rm $prefix.merge
   cut -f 1 $prefix.shuf > $srcfile
   cut -f 2 $prefix.shuf > $tgtfile
+  rm $prefix.shuf
 done
+# remove final , from LANGPAIRS
+LANGPAIRS=${LANGPAIRS::-1}
 
 EPOCH_SIZE=50000000
 
@@ -64,26 +68,29 @@ python ${LANMT_TAINER_DIR}/lanmttrainer/trainer/fairseq/shared_large_datasets.py
   --lang-pairs $LANGPAIRS \
   --epoch_sents $EPOCH_SIZE \
   --trainpref train \
-  --suffix_pair
+  --suffix-pair
 
 # Shared large datasets into chunks
 num_pairs=$(cat $LANGPAIRS_FILE | wc -l)
-num_parts=$(find $TRAIN_DIR -type f - name part*.train.* | wc -l)
-total_epoch=$[$num_pairs / $num_pairs / 2]
-echo $total_epoch
+num_parts=$(find $TRAIN_DIR -type f -name part*.train.* | wc -l)
+total_epoch=$[$num_parts / $num_pairs / 2]
+echo "Total shared: $total_epoch."
 
 for i in $(seq 0 $total_epoch); do
   echo "Sharding $i/$total_epoch..."
   for pair in $(cat $LANGPAIRS_FILE); do
     srclang=$(echo $pair | cut -d '-' -f 1)
     tgtlang=$(echo $pair | cut -d '-' -f 2)
+    databin=$TRAIN_DIR/data-bin/shard${i}
+    mkdir -p $databin
+    cp $TRAIN_DIR/data-bin/dict.src.txt $databin/dict.$srclang.txt
+    cp $TRAIN_DIR/data-bin/dict.tgt.txt $databin/dict.$tgtlang.txt
     fairseq-preprocess --source-lang $srclang --target-lang $tgtlang \
         --trainpref $TRAIN_DIR/part${i}.train.$pair \
         --validpref $TRAIN_DIR/valid.$pair \
-        --srcdict $TRAIN_DIR/data-bin/dict.src.txt \
-        --tgtdict $TRAIN_DIR/data-bin/dict.tgt.txt \
-        --joined-dictionary \
+        --srcdict $databin/dict.$srclang.txt \
+        --tgtdict $databin/dict.$tgtlang.txt \
         --destdir $TRAIN_DIR/data-bin/shard${i} \
-        --workers 40
+        --workers 40 > $databin/preprocess.$pair.log 2>&1
   done
 done
