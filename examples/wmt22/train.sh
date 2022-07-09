@@ -11,7 +11,7 @@ echo "Total shared: $total_epoch."
 
 PATH_TO_DATA="$TRAIN_DIR/data-bin/shard0"
 for i in `seq 1 $[${total_epoch}-1]`; do
-    PATH_TO_DATA="${PATH_TO_DATA}:$DATA_DIR/data-bin/shard${i}"
+    PATH_TO_DATA="${PATH_TO_DATA}:$TRAIN_DIR/data-bin/shard${i}"
 done
 
 echo "PATH_TO_DATA: $PATH_TO_DATA"
@@ -19,9 +19,10 @@ echo "PATH_TO_DATA: $PATH_TO_DATA"
 lang_list="$SOURCE_ROOT/WMT22-LANGS.txt"
 lang_pairs=""
 for pair in $(cat $LANGPAIRS_FILE); do
-  lang_pairs="${lang_pairs},${pair}"
+  lang_pairs="$pair,${lang_pairs}"
 done
 lang_pairs=${lang_pairs::-1}
+echo "lang_pairs: $lang_pairs"
 
 fairseq-train "$PATH_TO_DATA" \
   --arch transformer_wmt_en_de_big_t2t --layernorm-embedding \
@@ -42,5 +43,5 @@ fairseq-train "$PATH_TO_DATA" \
   --save-interval 1 \
   --tensorboard-logdir "$TRAIN_DIR/tensorboard" \
   --seed 221 --log-format simple --log-interval 100 \
-  --save-dir "$TRAIN_DIR/checkpoints" \
-  > $TRAIN_DIR/train.log 2>&1
+  --save-dir "$TRAIN_DIR/checkpoints"
+  # > $TRAIN_DIR/train.log 2>&1
