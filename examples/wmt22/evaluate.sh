@@ -19,26 +19,27 @@ for pair in $(cat $LANGPAIRS_FILE); do
   lang_pairs="$pair,${lang_pairs}"
 done
 lang_pairs=${lang_pairs::-1}
-lang_list="WMT22-LANGS.txt"
+lang_list="${SOURCE_ROOT}/WMT22-LANGS.txt"
 
 for pair in $(cat $LANGPAIRS_FILE);do
   srclang=$(echo $pair | cut -d '-' -f 1)
   tgtlang=$(echo $pair | cut -d '-' -f 2)
 
+  echo "Running evaluation for $srclang-$tgtlang."
   fairseq-generate $TRAIN_DIR/data-bin/shard0 \
     --path ${TRAIN_DIR}/checkpoints/checkpoint_last.pt \
     --task translation_multi_simple_epoch \
-    --gen-subset test \
+    --gen-subset valid \
     --source-lang $srclang \
     --target-lang $tgtlang \
     --lang-dict "$lang_list" \
     --lang-pairs "$lang_pairs" \
     --sacrebleu --remove-bpe 'sentencepiece'\
     --batch-size 64 \
-    --beam 3 \
+    --beam 5 \
     --encoder-langtok "src" \
     --decoder-langtok \
     --lang-dict "$lang_list" \
-    --lang-pairs "$lang_pairs" > $result_dir/generated.${srclang}_${tgtlang}.txt
-  exit 1
+    --lang-pairs "$lang_pairs" \
+    > $result_dir/generated.${srclang}_${tgtlang}.txt 2>/dev/null
 done
