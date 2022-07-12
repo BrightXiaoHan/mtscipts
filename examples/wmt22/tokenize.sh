@@ -42,6 +42,7 @@ function tokenize_all(){
     spm_encode --model=$SPM_MODEL_PREFIX.model --output_format=piece < $file > $file.spm &
     pwait 20
   done
+  wait
 
   for file in $(find $TEST_DATA_DIR -type f ! -name "*.spm");
   do
