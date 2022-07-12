@@ -39,7 +39,7 @@ fairseq-train "$PATH_TO_DATA" \
   --optimizer adam --adam-eps 1e-06 --adam-betas '(0.9, 0.98)' \
   --lr-scheduler inverse_sqrt --lr 0.0005 --warmup-updates 10000 --warmup-init-lr '1e-07' --max-update 1000000 \
   --dropout 0.1 --attention-dropout 0.1 --weight-decay 0.0 \
-  --max-tokens 10000 --update-freq 16 \
+  --max-tokens 9000 --update-freq 16 \
   --save-interval 1 \
   --tensorboard-logdir "$TRAIN_DIR/tensorboard" \
   --seed 221 --log-format simple --log-interval 100 \
